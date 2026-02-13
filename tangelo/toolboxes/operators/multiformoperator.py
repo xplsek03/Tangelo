@@ -147,7 +147,7 @@ class MultiformOperator(QubitOperator):
         for term_i, integer in enumerate(self.integer):
             new_cs = c_calc[self.integer[term_i], other_operator.integer]
             product[term_i * increment: (term_i + 1) * increment] = integer ^ other_operator.integer
-            factors[term_i * increment: (term_i + 1) * increment] = self.factors[term_i] * other_operator.factors * np.product(new_cs, axis=1)
+            factors[term_i * increment: (term_i + 1) * increment] = self.factors[term_i] * other_operator.factors * np.prod(new_cs, axis=1)
 
         product, factors = MultiformOperator.collapse(product, factors)
 

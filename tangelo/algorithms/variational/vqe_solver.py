@@ -319,7 +319,7 @@ class VQESolver:
         if self.save_energies:
             self.energies += [energy]
 
-        return energy
+        return energy.real  # MIKE
 
     def operator_expectation(self, operator, var_params=None, n_active_mos=None, n_active_electrons=None, n_active_sos=None, spin=None, ref_state=Circuit()):
         """Obtains the operator expectation value of a given operator.

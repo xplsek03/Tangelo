@@ -16,6 +16,8 @@
 import os
 from collections import Counter
 
+from datetime import datetime  # !!
+
 import numpy as np
 
 from tangelo.linq import Circuit, Gate, get_unitary_circuit_pieces
@@ -64,9 +66,18 @@ class QulacsSimulator(Backend):
             numpy.array: The statevector, if available for the target backend
                 and requested by the user (if not, set to None).
         """
+        
+        print("SIMULATE CIRCUIT NOW: ", datetime.now())
+        
         if desired_meas_result is None:
+
+            # from qulacs import QuantumCircuit je toto!
+            # toto se nejspis preklada zbytecne pokazde pokud je to stejnej obvod, 
+            # print("SPUSTI SE VZDY:")
+            print("BEFORE TRANSLATE: ", datetime.now())
             translated_circuit = translate_c(source_circuit, "qulacs", output_options={"noise_model": self._noise_model,
                                                                                        "save_measurements": save_mid_circuit_meas})
+            print("AFTER TRANSLATE: ", datetime.now())
 
         n_meas = source_circuit.counts.get("MEASURE", 0)
         n_cmeas = source_circuit.counts.get("CMEASURE", 0)
@@ -189,6 +200,12 @@ class QulacsSimulator(Backend):
 
         # Deterministic circuit, run once and sample from statevector
         elif not self._noise_model and not source_circuit.is_mixed_state:
+
+            # vypada ze vzdycky padne sem!!
+            # translated_circuit je qulacs vec
+            # update_quantum_state je qulacs fce
+            # tedy je to pravdepodobne optimalizaovane
+
             translated_circuit.update_quantum_state(state)
             self._current_state = state
 
@@ -196,6 +213,9 @@ class QulacsSimulator(Backend):
                 python_statevector = np.array(state.get_vector()) if return_statevector else None
                 samples = Counter(state.sampling(self.n_shots))  # this sampling still returns a list
             else:
+
+                # print("PADNE SEM VZDY@@@@@")
+
                 python_statevector = np.array(state.get_vector())
                 frequencies = self._statevector_to_frequencies(python_statevector)
                 return (frequencies, python_statevector) if return_statevector else (frequencies, None)
@@ -305,6 +325,9 @@ class QulacsSimulator(Backend):
 
         frequencies = {self._int_to_binstr(k, source_circuit.width): v / self.n_shots
                        for k, v in samples.items()}
+        
+        print("SIMULATE CIRCUIT END: ", datetime.now())
+
         return (frequencies, python_statevector) if return_statevector else (frequencies, None)
 
     def expectation_value_from_prepared_state(self, qubit_operator, n_qubits, prepared_state=None):

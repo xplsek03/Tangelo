@@ -206,8 +206,10 @@ class QulacsSimulator(Backend):
             # update_quantum_state je qulacs fce
             # tedy je to pravdepodobne optimalizaovane
 
+            print("DEBUG POINT 1: START: ", datetime.now())
             translated_circuit.update_quantum_state(state)
             self._current_state = state
+            print("DEBUG POINT 1: END: ", datetime.now())
 
             if self.n_shots is not None:
                 python_statevector = np.array(state.get_vector()) if return_statevector else None
@@ -217,7 +219,9 @@ class QulacsSimulator(Backend):
                 # print("PADNE SEM VZDY@@@@@")
 
                 python_statevector = np.array(state.get_vector())
+                print("DEBUG POINT 2: START: ", datetime.now())
                 frequencies = self._statevector_to_frequencies(python_statevector)
+                print("DEBUG POINT 2: END: ", datetime.now())
                 return (frequencies, python_statevector) if return_statevector else (frequencies, None)
 
         # If a desired_meas_result,

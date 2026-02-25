@@ -42,6 +42,7 @@ from tangelo.linq import Gate, Circuit
 from tangelo.linq.helpers.circuits.measurement_basis import measurement_basis_gates
 from tangelo.toolboxes.operators import QubitOperator
 
+from datetime import datetime  # !!
 
 def get_expectation_value_from_frequencies_oneterm(term, frequencies):
     """Return the expectation value of a single-term qubit-operator, given
@@ -363,15 +364,19 @@ class Backend(abc.ABC):
 
         # Else, separate the operator into 2 hermitian operators, use linearity and call this function twice
         else:
+            print("DBUG POINT 3: START: ", datetime.now())
             qb_op_real, qb_op_imag = QubitOperator(), QubitOperator()
             for term, coef in qubit_operator.terms.items():
                 qb_op_real.terms[term], qb_op_imag.terms[term] = coef.real, coef.imag
             qb_op_real.compress()
             qb_op_imag.compress()
+            print("DEBUG POINT 3: END: ", datetime.now())
+            print("NORIM SE SE DO REKURZE:")
             exp_real = self.get_expectation_value(qb_op_real, state_prep_circuit, initial_statevector=initial_statevector,
                                                   desired_meas_result=desired_meas_result)
             exp_imag = self.get_expectation_value(qb_op_imag, state_prep_circuit, initial_statevector=initial_statevector,
                                                   desired_meas_result=desired_meas_result)
+            print("JSEM VENKU Z REKURZE:")
             return exp_real if (exp_imag == 0.) else exp_real + 1.0j * exp_imag
 
     def get_variance(self, qubit_operator, state_prep_circuit, initial_statevector=None, desired_meas_result=None):

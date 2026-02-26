@@ -339,6 +339,8 @@ class Backend(abc.ABC):
         if initial_statevector is not None and not self.statevector_available:
             raise ValueError(f'Statevector not supported in {self.__class__}')
 
+        print(f"VOLAM get_expectation_value, are_coefficients_real={are_coefficients_real} : {datetime.now()}")
+
         # Check that qubit operator does not operate on qubits beyond circuit size.
         # Keep track if coefficients are real or not
         are_coefficients_real = True
@@ -350,6 +352,7 @@ class Backend(abc.ABC):
 
         # If the underlying operator is hermitian, expectation value is real and can be computed right away
         if are_coefficients_real:
+            print("REAL COEFFICIENTS")
             if self._noise_model or not self.statevector_available or self.n_shots is not None \
                     or (state_prep_circuit.is_mixed_state and self.n_shots is not None) or state_prep_circuit.size == 0:
                 return self._get_expectation_value_from_frequencies(qubit_operator,
@@ -474,6 +477,8 @@ class Backend(abc.ABC):
                 state preparation.
         """
 
+        print("_get_expectation_value_from_statevector START: ", datetime.now())
+
         n_qubits = state_prep_circuit.width
 
         expectation_value = 0.
@@ -510,6 +515,8 @@ class Backend(abc.ABC):
                 expectation_term = self.get_expectation_value_from_frequencies_oneterm(term, frequencies)
                 expectation_value += coef * expectation_term
 
+        print("_get_expectation_value_from_statevector END: ", datetime.now())
+
         return expectation_value
 
     def _get_expectation_value_from_frequencies(self, qubit_operator, state_prep_circuit, initial_statevector=None, desired_meas_result=None):
@@ -527,6 +534,8 @@ class Backend(abc.ABC):
             complex: The expectation value of this operator with regard to the
                 state preparation.
         """
+        print("_get_expectation_value_from_frequencies START : ", datetime.now())
+
         n_qubits = state_prep_circuit.width
         if not self.statevector_available or state_prep_circuit.is_mixed_state or self._noise_model:
             initial_circuit = state_prep_circuit
@@ -557,6 +566,8 @@ class Backend(abc.ABC):
                                            desired_meas_result=desired_meas_result)
             expectation_term = self.get_expectation_value_from_frequencies_oneterm(term, frequencies)
             expectation_value += coef * expectation_term
+
+        print("_get_expectation_value_from_frequencies END : ", datetime.now())
 
         return expectation_value
 

@@ -339,7 +339,7 @@ class Backend(abc.ABC):
         if initial_statevector is not None and not self.statevector_available:
             raise ValueError(f'Statevector not supported in {self.__class__}')
 
-        print(f"VOLAM get_expectation_value, are_coefficients_real={are_coefficients_real} : {datetime.now()}")
+        # print(f"VOLAM get_expectation_value, are_coefficients_real={are_coefficients_real} : {datetime.now()}")
 
         # Check that qubit operator does not operate on qubits beyond circuit size.
         # Keep track if coefficients are real or not
@@ -352,7 +352,7 @@ class Backend(abc.ABC):
 
         # If the underlying operator is hermitian, expectation value is real and can be computed right away
         if are_coefficients_real:
-            print("REAL COEFFICIENTS")
+            # print("REAL COEFFICIENTS")
             if self._noise_model or not self.statevector_available or self.n_shots is not None \
                     or (state_prep_circuit.is_mixed_state and self.n_shots is not None) or state_prep_circuit.size == 0:
                 return self._get_expectation_value_from_frequencies(qubit_operator,
@@ -367,19 +367,19 @@ class Backend(abc.ABC):
 
         # Else, separate the operator into 2 hermitian operators, use linearity and call this function twice
         else:
-            print("DBUG POINT 3: START: ", datetime.now())
+            # print("DBUG POINT 3: START: ", datetime.now())
             qb_op_real, qb_op_imag = QubitOperator(), QubitOperator()
             for term, coef in qubit_operator.terms.items():
                 qb_op_real.terms[term], qb_op_imag.terms[term] = coef.real, coef.imag
             qb_op_real.compress()
             qb_op_imag.compress()
-            print("DEBUG POINT 3: END: ", datetime.now())
-            print("NORIM SE SE DO REKURZE:")
+            # print("DEBUG POINT 3: END: ", datetime.now())
+            # print("NORIM SE SE DO REKURZE:")
             exp_real = self.get_expectation_value(qb_op_real, state_prep_circuit, initial_statevector=initial_statevector,
                                                   desired_meas_result=desired_meas_result)
             exp_imag = self.get_expectation_value(qb_op_imag, state_prep_circuit, initial_statevector=initial_statevector,
                                                   desired_meas_result=desired_meas_result)
-            print("JSEM VENKU Z REKURZE:")
+            # print("JSEM VENKU Z REKURZE:")
             return exp_real if (exp_imag == 0.) else exp_real + 1.0j * exp_imag
 
     def get_variance(self, qubit_operator, state_prep_circuit, initial_statevector=None, desired_meas_result=None):
@@ -477,7 +477,7 @@ class Backend(abc.ABC):
                 state preparation.
         """
 
-        print("_get_expectation_value_from_statevector START: ", datetime.now())
+        # print("_get_expectation_value_from_statevector START: ", datetime.now())
 
         n_qubits = state_prep_circuit.width
 
@@ -515,7 +515,7 @@ class Backend(abc.ABC):
                 expectation_term = self.get_expectation_value_from_frequencies_oneterm(term, frequencies)
                 expectation_value += coef * expectation_term
 
-        print("_get_expectation_value_from_statevector END: ", datetime.now())
+        # print("_get_expectation_value_from_statevector END: ", datetime.now())
 
         return expectation_value
 
@@ -534,7 +534,7 @@ class Backend(abc.ABC):
             complex: The expectation value of this operator with regard to the
                 state preparation.
         """
-        print("_get_expectation_value_from_frequencies START : ", datetime.now())
+        # print("_get_expectation_value_from_frequencies START : ", datetime.now())
 
         n_qubits = state_prep_circuit.width
         if not self.statevector_available or state_prep_circuit.is_mixed_state or self._noise_model:
@@ -567,7 +567,7 @@ class Backend(abc.ABC):
             expectation_term = self.get_expectation_value_from_frequencies_oneterm(term, frequencies)
             expectation_value += coef * expectation_term
 
-        print("_get_expectation_value_from_frequencies END : ", datetime.now())
+        # print("_get_expectation_value_from_frequencies END : ", datetime.now())
 
         return expectation_value
 

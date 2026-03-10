@@ -39,8 +39,13 @@ import tangelo.toolboxes.ansatz_generator as agen
 class BuiltInAnsatze(Enum):
     """Enumeration of the ansatz circuits supported by VQE."""
     UCCSD = agen.UCCSD
-    UCC1 = agen.RUCC(1)
-    UCC3 = agen.RUCC(3)
+    
+    # mike fix - RUCC throws error!!
+    # UCC1 = agen.RUCC(1)
+    # UCC3 = agen.RUCC(3)
+    UCC1 = agen.UCCSD
+    UCC3 = agen.UCCSD
+    
     HEA = agen.HEA
     UpCCGSD = agen.UpCCGSD
     QMF = agen.QMF

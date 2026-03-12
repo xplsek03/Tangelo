@@ -41,10 +41,11 @@ class BuiltInAnsatze(Enum):
     UCCSD = agen.UCCSD
     
     # mike fix - RUCC throws error!!
-    # UCC1 = agen.RUCC(1)
-    # UCC3 = agen.RUCC(3)
-    UCC1 = agen.UCCSD
-    UCC3 = agen.UCCSD
+    # if replaced mpi4py pickle->dill, it works normally 
+    UCC1 = agen.RUCC(1)
+    UCC3 = agen.RUCC(3)
+    #UCC1 = agen.UCCSD
+    #UCC3 = agen.UCCSD
     
     HEA = agen.HEA
     UpCCGSD = agen.UpCCGSD

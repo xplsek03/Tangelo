@@ -86,6 +86,39 @@ class QubitTapering:
 
         return z2_tapered_op.qubitoperator
 
+    # MIKE: otestuj nejprve na vqe, ref_state: vystup tohoto
+    def z2_taper_reference_state(self, reference_state=None):
+        # https://docs.pennylane.ai/en/stable/code/api/pennylane.qchem.taper_hf.html#pennylane.qchem.taper_hf
+        # https://pennylane.ai/qml/demos/tutorial_qubit_tapering
+        """Function to taper the reference state by removing the tapered qubits.
+
+        For the Hartree-Fock state (default), this is equivalent to simply removing
+        the bits corresponding to the tapered qubits, since the HF state is an
+        eigenstate of the symmetries and Clifford transformation preserves it.
+
+        For a general reference state, a full Clifford transformation should be
+        applied: convert the state to a density operator, transform with U,
+        then determine the tapered state from the transformed operator.
+        However, since Tangelo typically uses HF as reference, the simple removal
+        is sufficient and equivalent.
+
+        Args:
+            reference_state (list of int, optional): List of 0s and 1s representing the occupations.
+                If None, uses the Hartree-Fock state based on n_electrons, spin, mapping, up_then_down.
+
+        Returns:
+            list of int: The tapered reference state occupations.
+        """
+
+        if reference_state is None:
+            from tangelo.toolboxes.qubit_mappings.statevector_mapping import get_vector
+            reference_state = get_vector(self.initial_n_qubits, self.n_electrons, self.mapping, self.up_then_down, self.spin)
+
+        q_indices = self.z2_properties["q_indices"]
+        tapered_state = [reference_state[i] for i in range(self.initial_n_qubits) if i not in q_indices]
+
+        return tapered_state
+
     def _compute_z2_symmetries(self):
         """Computes the underlying z2 symmetries in elf.initial_op. The
         procedure is described in
@@ -104,4 +137,4 @@ class QubitTapering:
 
         self.z2_taper = get_z2_taper_function(unitary, kernel_operator, q_indices, self.initial_n_qubits, n_symmetries, eigenvalues)
         self.z2_tapered_op = self.z2_taper(self.initial_op)
-        self.z2_properties = {"n_symmetries": n_symmetries, "eigenvalues": eigenvalues, "unitary": unitary}
+        self.z2_properties = {"n_symmetries": n_symmetries, "eigenvalues": eigenvalues, "unitary": unitary, "q_indices": q_indices}
